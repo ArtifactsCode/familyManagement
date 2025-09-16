@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭财务管理系统 - 登录</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#3b82f6',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                        light: '#f3f4f6',
+                        dark: '#1f2937',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .bg-gradient-primary {
+                background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .card-shadow {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-primary p-6 text-center">
+                <h1 class="text-2xl font-bold text-white text-shadow">家庭财务管理系统</h1>
+                <p class="text-blue-100 mt-2">智能理财，轻松管理家庭财务</p>
+            </div>
+            <div class="p-6">
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-user"></i>
+                            </span>
+                            <input type="text" id="username" name="username" required
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                placeholder="请输入用户名">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-lock"></i>
+                            </span>
+                            <input type="password" id="password" name="password" required
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                                placeholder="请输入密码">
+                            <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
+                                <i class="fa fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" name="remember" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="remember" class="ml-2 block text-sm text-gray-700">记住我</label>
+                        </div>
+                        <a href="#" class="text-sm text-blue-600 hover:text-blue-800">忘记密码?</a>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+                            <i class="fa fa-sign-in mr-2"></i> 登录
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-6 text-center text-sm">
+                    <p class="text-gray-600">
+                        演示账号: 
+                        <button type="button" id="demoUser" class="text-blue-600 hover:text-blue-800 font-medium">普通用户</button> | 
+                        <button type="button" id="demoAdmin" class="text-blue-600 hover:text-blue-800 font-medium">管理员</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <p class="text-center text-gray-500 text-sm mt-4">© 2025 家庭财务管理系统 版权所有</p>
+    </div>
+
+    <script>
+        // 切换密码可见性
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // 切换图标
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        // 演示账号快速登录
+        document.getElementById('demoUser').addEventListener('click', function() {
+            document.getElementById('username').value = 'user';
+            document.getElementById('password').value = '123456';
+        });
+        
+        document.getElementById('demoAdmin').addEventListener('click', function() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+        });
+        
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 简单的登录验证
+            if (username === 'user' && password === '123456') {
+                // 普通用户登录
+                window.location.href = 'dashboard.html?user=user';
+            } else if (username === 'admin' && password === 'admin123') {
+                // 管理员登录
+                window.location.href = 'dashboard.html?user=admin';
+            } else {
+                // 登录失败提示
+                alert('用户名或密码错误，请重试！');
+            }
+        });
+    </script>
+</body>
+</html>

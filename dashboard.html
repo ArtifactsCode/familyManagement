@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭财务管理系统 - 主界面</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#3b82f6',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                        light: '#f3f4f6',
+                        dark: '#1f2937',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-all {
+                transition-property: all;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 150ms;
+            }
+            .sidebar-active {
+                @apply bg-blue-700 text-white;
+            }
+            .sidebar-icon {
+                @apply mr-3 text-lg;
+            }
+            .card-hover {
+                @apply hover:shadow-lg transition-all duration-300;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边导航栏 -->
+        <aside id="sidebar" class="bg-primary w-64 flex-shrink-0 hidden md:block transition-all duration-300">
+            <div class="h-full flex flex-col">
+                <!-- 系统标题 -->
+                <div class="flex items-center justify-center h-16 border-b border-blue-700">
+                    <h1 class="text-xl font-bold text-white">家庭财务管理系统</h1>
+                </div>
+                
+                <!-- 用户信息 -->
+                <div class="p-4 border-b border-blue-700">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center text-blue-800 font-bold">
+                            <span id="userInitials">用</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-white font-medium" id="userName">用户名</p>
+                            <p class="text-blue-200 text-xs" id="userRole">普通用户</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 导航菜单 -->
+                <nav class="flex-1 overflow-y-auto py-4">
+                    <ul class="space-y-2 px-3">
+                        <!-- 首页 -->
+                        <li>
+                            <a href="#dashboard" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg sidebar-active" data-target="dashboard-section">
+                                <i class="fa fa-dashboard sidebar-icon"></i>
+                                <span>首页</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 收入管理 -->
+                        <li>
+                            <a href="#income" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg hover:bg-blue-700" data-target="income-section">
+                                <i class="fa fa-money sidebar-icon"></i>
+                                <span>收入管理</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 支出管理 -->
+                        <li>
+                            <a href="#expense" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg hover:bg-blue-700" data-target="expense-section">
+                                <i class="fa fa-credit-card sidebar-icon"></i>
+                                <span>支出管理</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 理财管理 -->
+                        <li>
+                            <a href="#investment" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg hover:bg-blue-700" data-target="investment-section">
+                                <i class="fa fa-line-chart sidebar-icon"></i>
+                                <span>理财管理</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 借款管理 -->
+                        <li>
+                            <a href="#loan" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg hover:bg-blue-700" data-target="loan-section">
+                                <i class="fa fa-exchange sidebar-icon"></i>
+                                <span>借款管理</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 统计分析 -->
+                        <li>
+                            <a href="#statistics" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg hover:bg-blue-700" data-target="statistics-section">
+                                <i class="fa fa-bar-chart sidebar-icon"></i>
+                                <span>统计分析</span>
+                            </a>
+                        </li>
+                        
+                        <!-- 管理员功能 -->
+                        <li id="admin-menu" class="hidden">
+                            <a href="#admin" class="sidebar-link flex items-center px-4 py-3 text-blue-100 rounded-lg hover:bg-blue-700" data-target="admin-section">
+                                <i class="fa fa-cog sidebar-icon"></i>
+                                <span>系统管理</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- 退出按钮 -->
+                <div class="p-4 border-t border-blue-700">
+                    <button id="logoutBtn" class="w-full flex items-center justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition duration-200">
+                        <i class="fa fa-sign-out mr-2"></i> 退出登录
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between h-16 px-6">
+                    <!-- 移动端菜单按钮 -->
+                    <button id="mobile-menu-button" class="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                    
+                    <!-- 页面标题 -->
+                    <h2 class="text-lg font-medium text-gray-800" id="page-title">首页</h2>
+                    
+                    <!-- 右侧工具栏 -->
+                    <div class="flex items-center space-x-4">
+                        <!-- 搜索框 -->
+                        <div class="relative hidden md:block">
+                            <input type="text" placeholder="搜索..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                        
+                        <!-- 通知图标 -->
+                        <button class="relative text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fa fa-bell text-xl"></i>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                        
+                        <!-- 设置图标 -->
+                        <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                            <i class="fa fa-cog text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto p-6 bg-gray-100">
+                <!-- 首页内容 -->
+                <section id="dashboard-section" class="space-y-6">
+                    <!-- 概览卡片 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- 总收入 -->
+                        <div class="bg-white rounded-lg shadow p-6 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">本月总收入</p>
+                                    <p class="text-2xl font-bold text-gray-800 mt-1">¥12,500</p>
+                                    <p class="text-xs text-green-600 mt-2 flex items-center">
+                                        <i class="fa fa-arrow-up mr-1"></i> 12.5% 较上月
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                                    <i class="fa fa-money text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 总支出 -->
+                        <div class="bg-white rounded-lg shadow p-6 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">本月总支出</p>
+                                    <p class="text-2xl font-bold text-gray-800 mt-1">¥8,350</p>
+                                    <p class="text-xs text-red-600 mt-2 flex items-center">
+                                        <i class="fa fa-arrow-up mr-1"></i> 8.3% 较上月
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                    <i class="fa fa-credit-card text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 结余 -->
+                        <div class="bg-white rounded-lg shadow p-6 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">本月结余</p>
+                                    <p class="text-2xl font-bold text-gray-800 mt-1">¥4,150</p>
+                                    <p class="text-xs text-green-600 mt-2 flex items-center">
+                                        <i class="fa fa-arrow-up mr-1"></i> 25.7% 较上月
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                    <i class="fa fa-balance-scale text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 总资产 -->
+                        <div class="bg-white rounded-lg shadow p-6 card-hover">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500">总资产</p>
+                                    <p class="text-2xl font-bold text-gray-800 mt-1">¥125,680</p>
+                                    <p class="text-xs text-green-600 mt-2 flex items-center">
+                                        <i class="fa fa-arrow-up mr-1"></i> 3.2% 较上月
+                                    </p>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                    <i class="fa fa-pie-chart text-xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 图表区域 -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 月度收支对比 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-medium text-gray-800">月度收支对比</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">本月</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-blue-100 hover:text-blue-600">季度</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-blue-100 hover:text-blue-600">年度</button>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="incomeExpenseChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 支出类别占比 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-medium text-gray-800">支出类别占比</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-xs bg-blue-100 text-blue-600 rounded-full">本月</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-blue-100 hover:text-blue-600">季度</button>
+                                    <button class="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-blue-100 hover:text-blue-600">年度</button>
+                                </div>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="expenseCategoryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 最近记录 -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                            <h3 class="text-lg font-medium text-gray-800">最近记录</h3>
+                            <button class="text-sm text-blue-600 hover:text-blue-800">查看全部</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="recentRecords">
+                                    <!-- 记录将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 收入管理 -->
+                <section id="income-section" class="hidden space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">收入管理</h3>
+                            <button id="addIncomeBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center">
+                                <i class="fa fa-plus mr-2"></i> 添加收入
+                            </button>
+                        </div>
+                        
+                        <!-- 搜索和筛选 -->
+                        <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
+                            <div class="flex-1 max-w-md">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索收入记录..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <select class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">所有类型</option>
+                                    <option value="salary">工资</option>
+                                    <option value="bonus">奖金</option>
+                                    <option value="investment">理财收益</option>
+                                    <option value="other">其他</option>
+                                </select>
+                                <select class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">所有日期</option>
+                                    <option value="today">今天</option>
+                                    <option value="week">本周</option>
+                                    <option value="month">本月</option>
+                                    <option value="year">本年</option>
+                                </select>
+                                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200">
+                                    <i class="fa fa-filter mr-1"></i> 筛选
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 收入记录表格 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">备注</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="incomeRecords">
+                                    <!-- 收入记录将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="flex items-center justify-between mt-6">
+                            <div class="text-sm text-gray-700">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">24</span> 条记录
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 border border-blue-500 bg-blue-50 text-sm text-blue-600 rounded-md">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 支出管理 -->
+                <section id="expense-section" class="hidden space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">支出管理</h3>
+                            <button id="addExpenseBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center">
+                                <i class="fa fa-plus mr-2"></i> 添加支出
+                            </button>
+                        </div>
+                        
+                        <!-- 搜索和筛选 -->
+                        <div class="flex flex-wrap items-center justify-between mb-6 gap-4">
+                            <div class="flex-1 max-w-md">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索支出记录..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                        <i class="fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <select class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">所有类型</option>
+                                    <option value="food">食物</option>
+                                    <option value="clothing">服饰</option>
+                                    <option value="transportation">出行</option>
+                                    <option value="rent">房租</option>
+                                    <option value="utilities">水电煤</option>
+                                    <option value="entertainment">娱乐</option>
+                                    <option value="other">其他</option>
+                                </select>
+                                <select class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">所有日期</option>
+                                    <option value="today">今天</option>
+                                    <option value="week">本周</option>
+                                    <option value="month">本月</option>
+                                    <option value="year">本年</option>
+                                </select>
+                                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200">
+                                    <i class="fa fa-filter mr-1"></i> 筛选
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 支出记录表格 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">备注</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="expenseRecords">
+                                    <!-- 支出记录将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="flex items-center justify-between mt-6">
+                            <div class="text-sm text-gray-700">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">36</span> 条记录
+                            </div>
+                            <div class="flex space-x-1">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 border border-blue-500 bg-blue-50 text-sm text-blue-600 rounded-md">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">4</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 理财管理 -->
+                <section id="investment-section" class="hidden space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">理财管理</h3>
+                            <button id="addInvestmentBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center">
+                                <i class="fa fa-plus mr-2"></i> 添加理财
+                            </button>
+                        </div>
+                        
+                        <!-- 理财概览 -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <p class="text-sm font-medium text-gray-500">总投资额</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1">¥50,000</p>
+                            </div>
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <p class="text-sm font-medium text-gray-500">当前价值</p>
+                                <p class="text-2xl font-bold text-green-600 mt-1">¥56,820</p>
+                            </div>
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <p class="text-sm font-medium text-gray-500">收益率</p>
+                                <p class="text-2xl font-bold text-purple-600 mt-1">+13.64%</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 理财记录表格 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">备注</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="investmentRecords">
+                                    <!-- 理财记录将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 借款管理 -->
+                <section id="loan-section" class="hidden space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">借款管理</h3>
+                            <button id="addLoanBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center">
+                                <i class="fa fa-plus mr-2"></i> 添加借款
+                            </button>
+                        </div>
+                        
+                        <!-- 借款概览 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="bg-yellow-50 rounded-lg p-4">
+                                <p class="text-sm font-medium text-gray-500">借出金额</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1">¥8,000</p>
+                            </div>
+                            <div class="bg-orange-50 rounded-lg p-4">
+                                <p class="text-sm font-medium text-gray-500">借入金额</p>
+                                <p class="text-2xl font-bold text-gray-800 mt-1">¥12,500</p>
+                            </div>
+                        </div>
+                        
+                        <!-- 借款记录表格 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">对方</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">金额</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">备注</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="loanRecords">
+                                    <!-- 借款记录将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 统计分析 -->
+                <section id="statistics-section" class="hidden space-y-6">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">统计分析</h3>
+                            <div class="flex space-x-2">
+                                <select id="statPeriod" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="month">本月</option>
+                                    <option value="quarter">本季度</option>
+                                    <option value="year">本年</option>
+                                    <option value="custom">自定义</option>
+                                </select>
+                                <button id="exportStatsBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition duration-200 flex items-center">
+                                    <i class="fa fa-download mr-2"></i> 导出数据
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 统计图表 -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <!-- 收支趋势图 -->
+                            <div class="bg-white rounded-lg border border-gray-200 p-4">
+                                <h4 class="text-md font-medium text-gray-700 mb-4">收支趋势</h4>
+                                <div class="h-64">
+                                    <canvas id="incomeExpenseTrendChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- 支出类别饼图 -->
+                            <div class="bg-white rounded-lg border border-gray-200 p-4">
+                                <h4 class="text-md font-medium text-gray-700 mb-4">支出类别分布</h4>
+                                <div class="h-64">
+                                    <canvas id="expenseCategoryPieChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- 收入来源分析 -->
+                            <div class="bg-white rounded-lg border border-gray-200 p-4">
+                                <h4 class="text-md font-medium text-gray-700 mb-4">收入来源分析</h4>
+                                <div class="h-64">
+                                    <canvas id="incomeSourceChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- 月度结余分析 -->
+                            <div class="bg-white rounded-lg border border-gray-200 p-4">
+                                <h4 class="text-md font-medium text-gray-700 mb-4">月度结余分析</h4>
+                                <div class="h-64">
+                                    <canvas id="monthlyBalanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 管理员功能 -->
+                <section id="admin-section" class="hidden space-y-6">
+                    <!-- 用户管理 -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">用户管理</h3>
+                            <button id="addUserBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200 flex items-center">
+                                <i class="fa fa-plus mr-2"></i> 添加用户
+                            </button>
+                        </div>
+                        
+                        <!-- 用户列表 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户名</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户类型</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">admin</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">管理员</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">管理员</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">活跃</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                                            <button class="text-red-600 hover:text-red-900">删除</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">user</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">普通用户</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">普通用户</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-15</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">活跃</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                                            <button class="text-red-600 hover:text-red-900">删除</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 类别管理 -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-800">类别管理</h3>
+                        </div>
+                        
+                        <!-- 类别标签页 -->
+                        <div class="mb-6">
+                            <div class="border-b border-gray-200">
+                                <nav class="-mb-px flex space-x-8">
+                                    <a href="#" class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">收入类型</a>
+                                    <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">支出类型</a>
+                                    <a href="#" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">理财类型</a>
+                                </nav>
+                            </div>
+                        </div>
+                        
+                        <!-- 收入类型管理 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型名称</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建日期</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">工资</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">每月工资收入</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                                            <button class="text-red-600 hover:text-red-900">删除</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">奖金</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">绩效奖金、年终奖等</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                                            <button class="text-red-600 hover:text-red-900">删除</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">理财收益</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">股票、基金等投资收益</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                                            <button class="text-red-600 hover:text-red-900">删除</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">其他</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">其他收入来源</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-01</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                                            <button class="text-red-600 hover:text-red-900">删除</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 添加类别 -->
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h4 class="text-md font-medium text-gray-700 mb-4">添加收入类型</h4>
+                            <div class="flex space-x-4">
+                                <input type="text" placeholder="类型名称" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <input type="text" placeholder="描述" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200">
+                                    添加
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- 添加收入模态框 -->
+    <div id="addIncomeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-800">添加收入</h3>
+                <button class="close-modal text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addIncomeForm" class="space-y-4">
+                    <div>
+                        <label for="incomeType" class="block text-sm font-medium text-gray-700 mb-1">收入类型</label>
+                        <select id="incomeType" name="incomeType" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">请选择类型</option>
+                            <option value="salary">工资</option>
+                            <option value="bonus">奖金</option>
+                            <option value="investment">理财收益</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="incomeAmount" class="block text-sm font-medium text-gray-700 mb-1">金额</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-yen"></i>
+                            </span>
+                            <input type="number" id="incomeAmount" name="incomeAmount" step="0.01" min="0" required
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="incomeDate" class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                        <input type="date" id="incomeDate" name="incomeDate" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="incomeNote" class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                        <textarea id="incomeNote" name="incomeNote" rows="3"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="请输入备注信息"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="flex items-center justify-end p-6 border-t border-gray-200 space-x-3">
+                <button class="close-modal px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200">
+                    取消
+                </button>
+                <button id="saveIncomeBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200">
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加支出模态框 -->
+    <div id="addExpenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-800">添加支出</h3>
+                <button class="close-modal text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addExpenseForm" class="space-y-4">
+                    <div>
+                        <label for="expenseType" class="block text-sm font-medium text-gray-700 mb-1">支出类型</label>
+                        <select id="expenseType" name="expenseType" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">请选择类型</option>
+                            <option value="food">食物</option>
+                            <option value="clothing">服饰</option>
+                            <option value="transportation">出行</option>
+                            <option value="rent">房租</option>
+                            <option value="utilities">水电煤</option>
+                            <option value="entertainment">娱乐</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expenseAmount" class="block text-sm font-medium text-gray-700 mb-1">金额</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-yen"></i>
+                            </span>
+                            <input type="number" id="expenseAmount" name="expenseAmount" step="0.01" min="0" required
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="expenseDate" class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                        <input type="date" id="expenseDate" name="expenseDate" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="expenseNote" class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                        <textarea id="expenseNote" name="expenseNote" rows="3"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="请输入备注信息"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="flex items-center justify-end p-6 border-t border-gray-200 space-x-3">
+                <button class="close-modal px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200">
+                    取消
+                </button>
+                <button id="saveExpenseBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200">
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加理财模态框 -->
+    <div id="addInvestmentModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-800">添加理财</h3>
+                <button class="close-modal text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addInvestmentForm" class="space-y-4">
+                    <div>
+                        <label for="investmentType" class="block text-sm font-medium text-gray-700 mb-1">理财类型</label>
+                        <select id="investmentType" name="investmentType" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">请选择类型</option>
+                            <option value="fund">基金</option>
+                            <option value="stock">股票</option>
+                            <option value="bond">债券</option>
+                            <option value="gold">黄金</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="investmentOperation" class="block text-sm font-medium text-gray-700 mb-1">操作类型</label>
+                        <select id="investmentOperation" name="investmentOperation" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="buy">买入</option>
+                            <option value="sell">卖出</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="investmentAmount" class="block text-sm font-medium text-gray-700 mb-1">金额</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-yen"></i>
+                            </span>
+                            <input type="number" id="investmentAmount" name="investmentAmount" step="0.01" min="0" required
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="investmentDate" class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                        <input type="date" id="investmentDate" name="investmentDate" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="investmentNote" class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                        <textarea id="investmentNote" name="investmentNote" rows="3"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="请输入备注信息"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="flex items-center justify-end p-6 border-t border-gray-200 space-x-3">
+                <button class="close-modal px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200">
+                    取消
+                </button>
+                <button id="saveInvestmentBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200">
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加借款模态框 -->
+    <div id="addLoanModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-800">添加借款</h3>
+                <button class="close-modal text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="addLoanForm" class="space-y-4">
+                    <div>
+                        <label for="loanPerson" class="block text-sm font-medium text-gray-700 mb-1">对方姓名</label>
+                        <input type="text" id="loanPerson" name="loanPerson" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="请输入对方姓名">
+                    </div>
+                    <div>
+                        <label for="loanType" class="block text-sm font-medium text-gray-700 mb-1">借款类型</label>
+                        <select id="loanType" name="loanType" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="lend">借出</option>
+                            <option value="borrow">借入</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="loanOperation" class="block text-sm font-medium text-gray-700 mb-1">操作类型</label>
+                        <select id="loanOperation" name="loanOperation" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="add">新增</option>
+                            <option value="return">归还</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="loanAmount" class="block text-sm font-medium text-gray-700 mb-1">金额</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                                <i class="fa fa-yen"></i>
+                            </span>
+                            <input type="number" id="loanAmount" name="loanAmount" step="0.01" min="0" required
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="loanDate" class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                        <input type="date" id="loanDate" name="loanDate" required
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label for="loanNote" class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                        <textarea id="loanNote" name="loanNote" rows="3"
+                            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="请输入备注信息"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="flex items-center justify-end p-6 border-t border-gray-200 space-x-3">
+                <button class="close-modal px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition duration-200">
+                    取消
+                </button>
+                <button id="saveLoanBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition duration-200">
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+        
+        // 用户类型
+        const userType = getUrlParameter('user') || 'user';
+        
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置用户信息
+            if (userType === 'admin') {
+                document.getElementById('userName').textContent = '管理员';
+                document.getElementById('userRole').textContent = '管理员';
+                document.getElementById('userInitials').textContent = '管';
+                document.getElementById('admin-menu').classList.remove('hidden');
+            } else {
+                document.getElementById('userName').textContent = '普通用户';
+                document.getElementById('userRole').textContent = '普通用户';
+                document.getElementById('userInitials').textContent = '用';
+            }
+            
+            // 初始化图表
+            initCharts();
+            
+            // 生成模拟数据
+            generateMockData();
+            
+            // 设置当前日期
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('input[type="date"]').forEach(input => {
+                input.value = today;
+            });
+            
+            // 侧边栏导航
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 更新活动状态
+                    sidebarLinks.forEach(item => item.classList.remove('sidebar-active'));
+                    this.classList.add('sidebar-active');
+                    
+                    // 显示对应内容
+                    const targetId = this.getAttribute('data-target');
+                    document.querySelectorAll('main > section').forEach(section => {
+                        section.classList.add('hidden');
+                    });
+                    document.getElementById(targetId).classList.remove('hidden');
+                    
+                    // 更新页面标题
+                    document.getElementById('page-title').textContent = this.querySelector('span').textContent;
+                });
+            });
+            
+            // 移动端菜单切换
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sidebar = document.getElementById('sidebar');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('z-20');
+                sidebar.classList.toggle('h-screen');
+            });
+            
+            // 模态框控制
+            const modals = {
+                'addIncomeBtn': 'addIncomeModal',
+                'addExpenseBtn': 'addExpenseModal',
+                'addInvestmentBtn': 'addInvestmentModal',
+                'addLoanBtn': 'addLoanModal'
+            };
+            
+            // 打开模态框
+            Object.keys(modals).forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.addEventListener('click', function() {
+                        document.getElementById(modals[btnId]).classList.remove('hidden');
+                    });
+                }
+            });
+            
+            // 关闭模态框
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.closest('.fixed').classList.add('hidden');
+                });
+            });
+            
+            // 保存按钮事件
+            document.getElementById('saveIncomeBtn').addEventListener('click', function() {
+                // 模拟保存操作
+                alert('收入记录已保存！');
+                document.getElementById('addIncomeModal').classList.add('hidden');
+            });
+            
+            document.getElementById('saveExpenseBtn').addEventListener('click', function() {
+                // 模拟保存操作
+                alert('支出记录已保存！');
+                document.getElementById('addExpenseModal').classList.add('hidden');
+            });
+            
+            document.getElementById('saveInvestmentBtn').addEventListener('click', function() {
+                // 模拟保存操作
+                alert('理财记录已保存！');
+                document.getElementById('addInvestmentModal').classList.add('hidden');
+            });
+            
+            document.getElementById('saveLoanBtn').addEventListener('click', function() {
+                // 模拟保存操作
+                alert('借款记录已保存！');
+                document.getElementById('addLoanModal').classList.add('hidden');
+            });
+            
+            // 导出统计数据
+            document.getElementById('exportStatsBtn').addEventListener('click', function() {
+                alert('统计数据已导出！');
+            });
+            
+            // 退出登录
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+        });
+        
+        // 初始化图表
+        function initCharts() {
+            // 月度收支对比图
+            const incomeExpenseCtx = document.getElementById('incomeExpenseChart').getContext('2d');
+            new Chart(incomeExpenseCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [
+                        {
+                            label: '收入',
+                            data: [12500, 11800, 13200, 12900, 13500, 12500],
+                            backgroundColor: '#10b981',
+                            borderColor: '#059669',
+                            borderWidth: 1
+                        },
+                        {
+                            label: '支出',
+                            data: [8200, 7900, 8500, 8100, 8400, 8350],
+                            backgroundColor: '#ef4444',
+                            borderColor: '#dc2626',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '¥' + value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ¥' + context.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 支出类别占比图
+            const expenseCategoryCtx = document.getElementById('expenseCategoryChart').getContext('2d');
+            new Chart(expenseCategoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['食物', '房租', '交通', '娱乐', '购物', '其他'],
+                    datasets: [{
+                        data: [30, 25, 15, 10, 12, 8],
+                        backgroundColor: [
+                            '#3b82f6',
+                            '#ef4444',
+                            '#f59e0b',
+                            '#8b5cf6',
+                            '#ec4899',
+                            '#6b7280'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 统计分析页面图表
+            if (document.getElementById('incomeExpenseTrendChart')) {
+                const trendCtx = document.getElementById('incomeExpenseTrendChart').getContext('2d');
+                new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [
+                            {
+                                label: '收入',
+                                data: [12500, 11800, 13200, 12900, 13500, 12500],
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: '支出',
+                                data: [8200, 7900, 8500, 8100, 8400, 8350],
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                const pieCtx = document.getElementById('expenseCategoryPieChart').getContext('2d');
+                new Chart(pieCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['食物', '房租', '交通', '娱乐', '购物', '其他'],
+                        datasets: [{
+                            data: [30, 25, 15, 10, 12, 8],
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#ef4444',
+                                '#f59e0b',
+                                '#8b5cf6',
+                                '#ec4899',
+                                '#6b7280'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            }
+                        }
+                    }
+                });
+                
+                const incomeSourceCtx = document.getElementById('incomeSourceChart').getContext('2d');
+                new Chart(incomeSourceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['工资', '奖金', '理财收益', '其他'],
+                        datasets: [{
+                            data: [65, 15, 12, 8],
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#10b981',
+                                '#f59e0b',
+                                '#6b7280'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            }
+                        }
+                    }
+                });
+                
+                const balanceCtx = document.getElementById('monthlyBalanceChart').getContext('2d');
+                new Chart(balanceCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '月度结余',
+                            data: [4300, 3900, 4700, 4800, 5100, 4150],
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#2563eb',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '¥' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 生成模拟数据
+        function generateMockData() {
+            // 最近记录
+            const recentRecords = [
+                { date: '2025-07-15', type: '支出', category: '食物', amount: '¥268', note: '晚餐' },
+                { date: '2025-07-14', type: '收入', category: '工资', amount: '¥12,500', note: '7月份工资' },
+                { date: '2025-07-12', type: '支出', category: '房租', amount: '¥3,500', note: '7月份房租' },
+                { date: '2025-07-10', type: '支出', category: '交通', amount: '¥120', note: '打车' },
+                { date: '2025-07-08', type: '理财', category: '基金', amount: '¥2,000', note: '购买指数基金' }
+            ];
+            
+            const recentRecordsTable = document.getElementById('recentRecords');
+            recentRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // 设置金额颜色
+                const amountColor = record.type === '支出' ? 'text-red-600' : 'text-green-600';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.type === '支出' ? 'bg-red-100 text-red-800' : record.type === '收入' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">${record.type}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.category}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${amountColor}">${record.amount}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${record.note}</td>
+                `;
+                
+                recentRecordsTable.appendChild(row);
+            });
+            
+            // 收入记录
+            const incomeRecords = [
+                { date: '2025-07-14', type: '工资', amount: '¥12,500', note: '7月份工资' },
+                { date: '2025-07-05', type: '理财收益', amount: '¥320', note: '基金分红' },
+                { date: '2025-06-30', type: '奖金', amount: '¥5,000', note: '半年奖金' },
+                { date: '2025-06-15', type: '工资', amount: '¥12,300', note: '6月份工资' },
+                { date: '2025-06-08', type: '理财收益', amount: '¥280', note: '股票分红' }
+            ];
+            
+            const incomeRecordsTable = document.getElementById('incomeRecords');
+            incomeRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">${record.amount}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${record.note}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                        <button class="text-red-600 hover:text-red-900">删除</button>
+                    </td>
+                `;
+                
+                incomeRecordsTable.appendChild(row);
+            });
+            
+            // 支出记录
+            const expenseRecords = [
+                { date: '2025-07-15', type: '食物', amount: '¥268', note: '晚餐' },
+                { date: '2025-07-12', type: '房租', amount: '¥3,500', note: '7月份房租' },
+                { date: '2025-07-10', type: '交通', amount: '¥120', note: '打车' },
+                { date: '2025-07-08', type: '购物', amount: '¥890', note: '购买衣服' },
+                { date: '2025-07-05', type: '娱乐', amount: '¥360', note: '电影票' }
+            ];
+            
+            const expenseRecordsTable = document.getElementById('expenseRecords');
+            expenseRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // 高亮显示大额支出
+                const amountClass = parseInt(record.amount.replace(/[^\d]/g, '')) > 1000 ? 'text-red-600 font-bold' : 'text-red-600';
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${amountClass}">${record.amount}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${record.note}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                        <button class="text-red-600 hover:text-red-900">删除</button>
+                    </td>
+                `;
+                
+                expenseRecordsTable.appendChild(row);
+            });
+            
+            // 理财记录
+            const investmentRecords = [
+                { date: '2025-07-08', type: '基金', operation: '买入', amount: '¥2,000', status: '持有', note: '购买指数基金' },
+                { date: '2025-07-01', type: '股票', operation: '卖出', amount: '¥5,680', status: '已卖出', note: '卖出阿里巴巴股票' },
+                { date: '2025-06-25', type: '基金', operation: '买入', amount: '¥3,000', status: '持有', note: '购买债券基金' },
+                { date: '2025-06-15', type: '股票', operation: '买入', amount: '¥8,000', status: '持有', note: '购买腾讯股票' },
+                { date: '2025-06-10', type: '黄金', operation: '买入', amount: '¥10,000', status: '持有', note: '购买黄金ETF' }
+            ];
+            
+            const investmentRecordsTable = document.getElementById('investmentRecords');
+            investmentRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.operation}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${record.amount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.status === '持有' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">${record.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${record.note}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                        <button class="text-red-600 hover:text-red-900">删除</button>
+                    </td>
+                `;
+                
+                investmentRecordsTable.appendChild(row);
+            });
+            
+            // 借款记录
+            const loanRecords = [
+                { date: '2025-07-05', person: '张三', type: '借出', operation: '新增', amount: '¥5,000', status: '未还', note: '朋友周转' },
+                { date: '2025-06-28', person: '李四', type: '借入', operation: '新增', amount: '¥10,000', status: '未还', note: '买房首付' },
+                { date: '2025-06-15', person: '王五', type: '借出', operation: '归还', amount: '¥3,000', status: '已还', note: '还款' },
+                { date: '2025-06-01', person: '赵六', type: '借入', operation: '归还', amount: '¥5,000', status: '已还', note: '还款' },
+                { date: '2025-05-20', person: '孙七', type: '借出', operation: '新增', amount: '¥3,000', status: '未还', note: '应急' }
+            ];
+            
+            const loanRecordsTable = document.getElementById('loanRecords');
+            loanRecords.forEach(record => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${record.date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.person}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.type}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${record.operation}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${record.type === '借出' ? 'text-blue-600' : 'text-orange-600'}">${record.amount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${record.status === '已还' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${record.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">${record.note}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button class="text-blue-600 hover:text-blue-900 mr-3">编辑</button>
+                        <button class="text-red-600 hover:text-red-900">删除</button>
+                    </td>
+                `;
+                
+                loanRecordsTable.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
